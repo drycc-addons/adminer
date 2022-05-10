@@ -62,4 +62,3 @@ ENTRYPOINT [ "init-stack", "entrypoint.sh", "php-entrypoint" ]
 
 CMD [ "boot" ]
 EXPOSE 80
-EXPOSE 443
