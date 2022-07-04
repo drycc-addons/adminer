@@ -52,8 +52,8 @@ RUN . init-stack \
     /lib/udev \
     /usr/lib/`echo $(uname -m)`-linux-gnu/gconv/IBM* \
     /usr/lib/`echo $(uname -m)`-linux-gnu/gconv/EBC* \
-  && mkdir -p /usr/share/man/man{1..8} ${php_layer_dir}/log/ \
-  && chown -R ${DRYCC_UID}:${DRYCC_GID} /opt/drycc
+  && mkdir -p /usr/share/man/man{1..8} /drycc/{php-fpm,nginx,vouch-proxy} \
+  && chown -R ${DRYCC_UID}:${DRYCC_GID} /opt/drycc /drycc/{php-fpm,nginx,vouch-proxy}
 
 COPY entrypoint.sh /opt/drycc/php/bin
 COPY *.php /opt/drycc/adminer/

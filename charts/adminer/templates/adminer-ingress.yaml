@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "drycc-adminer"
+  labels:
+    app: "adminer"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+  annotations:
+    kubernetes.io/tls-acme: "true"
+spec:
+  {{- if not (eq .Values.ingressClass "") }}
+  ingressClassName: "{{ .Values.ingressClass }}"
+  {{- end }}
+  rules:
+  - host: drycc-adminer.{{ .Values.platformDomain }}
+    http:
+      paths:
+      - pathType: Prefix
+        {{- if eq .Values.ingressClass "gce" "alb" }}
+        path: /*
+        {{- else }}{{/* Has annotations but ingress class is not "gce" nor "alb" */}}
+        path: /
+        {{- end }}
+        backend:
+          service:
+            name: drycc-adminer
+            port:
+              number: 8080
+  {{- if .Values.certManagerEnabled }}
+  tls:
+    - secretName: drycc-adminer-certificate-auto
+      hosts:
+        - drycc-adminer.{{ .Values.platformDomain }}
+  {{- end }}

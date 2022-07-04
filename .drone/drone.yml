@@ -101,3 +101,27 @@ trigger:
 depends_on:
 - linux-amd64
 - linux-arm64
+
+---
+kind: pipeline
+type: exec
+name: chart
+
+steps:
+- name: generate chart
+  commands:
+  - IMAGE_TAG=$([ ! -z $DRONE_TAG ] && echo \"${DRONE_TAG:1}\" || echo \"canary\")
+  - sed -i "s/imageTag:\ \"canary\"/imageTag:\ $IMAGE_TAG/g" charts/adminer/values.yaml
+  - helm package -u charts/adminer --version ${DRONE_TAG:-v1.0.0}
+  - curl -u $CHARTMUSEUM_USERNAME:$CHARTMUSEUM_PASSWORD -F chart=@adminer-${DRONE_TAG:-v1.0.0}.tgz "$CHARTMUSEUM_API/api/$([ -z $DRONE_TAG ] && echo testing || echo stable)/charts"
+  environment:
+    CHARTMUSEUM_USERNAME:
+      from_secret: chartmuseum_username
+    CHARTMUSEUM_PASSWORD:
+      from_secret: chartmuseum_password
+    CHARTMUSEUM_API:
+      from_secret: chartmuseum_api
+  when:
+    event:
+    - push
+    - tag

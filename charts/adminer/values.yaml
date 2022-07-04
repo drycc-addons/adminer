@@ -1,0 +1,84 @@
+imageOrg: "drycc-addons"
+imagePullPolicy: "Always"
+imageTag: "canary"
+imageRegistry: "registry.drycc.cc"
+appImagePullPolicy: "Always"
+
+# Set adminer deployment  replicas
+replicas: 1
+
+# limitsCpu: "200m"
+# limitsMemory: "512Mi"
+
+nodeAffinityPreset:
+  key: "drycc.cc/node"
+  type: "soft"
+  values:
+  - "true"
+
+podAffinityPreset:
+  key: "security"
+  type: ""
+  values:
+  - "drycc-security"
+
+podAntiAffinityPreset:
+  key: "app"
+  type: "soft"
+  values:
+  - "drycc-adminer"
+
+# Service
+service:
+  # Provide any additional service annotations
+  annotations: {}
+
+# Any custom adminer environment variables
+# can be specified as key-value pairs under environment
+# this is usually a non required setting.
+environment:
+  RESERVED_NAMES: "drycc, drycc-adminer"
+  # adminer config
+  # ref: https://github.com/vrana/adminer
+  ADMINER_DESIGN: hydra
+  # vouch-proxy config
+  # ref: https://github.com/vouch/vouch-proxy/blob/master/config/config.yml_example
+  VOUCH_DOMAINS: "vouch-nginx.domain.com,email.com"
+  VOUCH_COOKIE_SECURE: "false"
+  OAUTH_PROVIDER: oidc
+  OAUTH_CLIENT_ID: client_id
+  OAUTH_CLIENT_SECRET: client_secret
+  OAUTH_AUTH_URL: http://passport.domain.com/oauth/authorize/
+  OAUTH_TOKEN_URL: http://passport.domain.com/oauth/token/
+  OAUTH_USER_INFO_URL: http://passport.domain.com/oauth/userinfo/
+  OAUTH_CALLBACK_URL: http://vouch-nginx.domain.com/auth
+  OAUTH_CALLBACK_URLS: http://vouch-nginx.domain.com/auth
+  OAUTH_SCOPES: openid
+  OAUTH_END_SESSION_ENDPOINT: ""
+  OAUTH_USER_TEAM_URL: ""
+  OAUTH_USER_ORG_URL: ""
+  OAUTH_PREFERREDDOMAIN: ""
+  OAUTH_CLAIMS: ""
+  OAUTH_CODE_CHALLENGE_METHOD: ""
+  OAUTH_RELYING_PARTY_ID: ""
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  storageClass: ""
+  volumeName: ""
+
+# Please check `kubernetes.io/ingress.class`
+ingressClass: ""
+# A domain name consists of one or more parts.
+# Periods (.) are used to separate these parts.
+# Each part must be 1 to 63 characters in length and can contain lowercase letters, digits, and hyphens (-).
+# It must start and end with a lowercase letter or digit.
+clusterDomain: "cluster.local"
+# The public resolvable hostname to build your cluster with.
+#
+# This will be the hostname that is used to build endpoints such as "drycc.$HOSTNAME"
+platformDomain: ""
+# Whether cert_manager is enabled to automatically generate adminer certificates
+certManagerEnabled: false

@@ -1,0 +1,12 @@
+name: adminer
+home: https://github.com/drycc-addons/adminer
+apiVersion: v2
+dependencies:
+  - name: common
+    repository: https://charts.drycc.cc/stable
+    version: 1.x.x
+description: Database management in a single PHP file.
+maintainers:
+  - name: Drycc Team
+    email: engineering@drycc.com
+version: v1.0.0

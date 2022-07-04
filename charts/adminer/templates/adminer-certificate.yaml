@@ -1,0 +1,15 @@
+{{- if .Values.certManagerEnabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: drycc-adminer
+spec:
+  secretName: drycc-adminer-certificate-auto
+  issuerRef:
+    name: drycc-cluster-issuer
+    kind: ClusterIssuer
+  dnsNames:
+  - drycc-adminer.{{ .Values.platformDomain }}
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
