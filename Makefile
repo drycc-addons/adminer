@@ -10,30 +10,27 @@ include versioning.mk
 
 DEV_ENV_IMAGE := ${DRYCC_REGISTRY}/drycc/go-dev
 DEV_ENV_WORK_DIR := /opt/drycc/go/src/${REPO_PATH}
-DEV_ENV_CMD := docker run --rm -v ${CURDIR}:${DEV_ENV_WORK_DIR} -w ${DEV_ENV_WORK_DIR} ${DEV_ENV_IMAGE}
+DEV_ENV_CMD := podman run --rm -v ${CURDIR}:${DEV_ENV_WORK_DIR} -w ${DEV_ENV_WORK_DIR} ${DEV_ENV_IMAGE}
 
 # Test processes used in quick unit testing
 TEST_PROCS ?= 4
 
-check-docker:
-	@if [ -z $$(which docker) ]; then \
-	  echo "Missing \`docker\` client which is required for development"; \
+check-podman:
+	@if [ -z $$(which podman) ]; then \
+	  echo "Missing \`podman\` client which is required for development"; \
 	  exit 2; \
 	fi
 
-build: docker-build
+build: podman-build
 
-docker-build: check-docker
-	docker build ${DOCKER_BUILD_FLAGS} -t ${IMAGE} ${ADMINER_VERSION}/debian
-	docker tag ${IMAGE} ${MUTABLE_IMAGE}
+podman-build: check-podman
+	podman build ${PODMAN_BUILD_FLAGS} -t ${IMAGE} ${ADMINER_VERSION}/debian
+	podman tag ${IMAGE} ${MUTABLE_IMAGE}
 
-docker-buildx: check-docker
-	docker buildx build --platform ${PLATFORM} -t ${IMAGE} ${ADMINER_VERSION}/debian --push
+clean: check-podman
+	podman rmi $(IMAGE)
 
-clean: check-docker
-	docker rmi $(IMAGE)
+full-clean: check-podman
+	podman images -q $(IMAGE_PREFIX)/$(COMPONENT) | xargs podman rmi -f
 
-full-clean: check-docker
-	docker images -q $(IMAGE_PREFIX)/$(COMPONENT) | xargs docker rmi -f
-
-.PHONY: build docker-build clean commit-hook full-clean
+.PHONY: build podman-build clean commit-hook full-clean

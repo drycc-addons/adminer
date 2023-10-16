@@ -1,5 +1,5 @@
 <?php
-namespace docker {
+namespace container{
 	function adminer_object() {
 		require_once('plugins/plugin.php');
 
@@ -36,7 +36,7 @@ namespace {
 	}
 
 	function adminer_object() {
-		return \docker\adminer_object();
+		return \container\adminer_object();
 	}
 
 	require('adminer.php');

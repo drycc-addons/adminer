@@ -22,13 +22,12 @@ COPY rootfs/lib/ /opt/drycc/php/lib/
 COPY rootfs/config/php/ /opt/drycc/php/etc/
 COPY rootfs/config/nginx/ /opt/drycc/nginx/conf/
 
-RUN . init-stack \
-  && buildDeps='git gcc pkg-config postgresql-server-dev-all sqlite3 libsqlite3-dev unixodbc-dev freetds-dev xz-utils' \
+RUN buildDeps='git gcc pkg-config postgresql-server-dev-all sqlite3 libsqlite3-dev unixodbc-dev freetds-dev xz-utils' \
   && install-packages ${buildDeps} libnss-wrapper \
   && ln -s "/usr/lib/`echo $(uname -m)`-linux-gnu/libsybdb.so" /usr/lib/libsybdb.so \
   && echo "export NSS_WRAPPER_LIB=/usr/lib/`echo $(uname -m)`-linux-gnu/libnss_wrapper.so" >> /opt/drycc/php/profile.d/php.sh \
-  && php-ext-configure pdo_odbc --with-php-config="${php_layer_dir}"/bin/php-config --with-pdo-odbc=unixODBC,/usr \
-  && php-ext-install mysqli pdo_pgsql pdo_sqlite pdo_odbc pdo_dblib --ini-name "${php_layer_dir}"/etc/php.ini \
+  && init-stack php-ext-configure pdo_odbc --with-php-config="${php_layer_dir}"/bin/php-config --with-pdo-odbc=unixODBC,/usr \
+  && init-stack php-ext-install mysqli pdo_pgsql pdo_sqlite pdo_odbc pdo_dblib --ini-name "${php_layer_dir}"/etc/php.ini \
   && git clone --recurse-submodules=designs --depth 1 --shallow-submodules --branch "v${ADMINER_VERSION}" https://github.com/vrana/adminer.git /tmp/adminer \
   && curl -fsSL "https://github.com/vrana/adminer/releases/download/v${ADMINER_VERSION}/adminer-${ADMINER_VERSION}.php" -o adminer.php \
   && cp -r /tmp/adminer/designs/ /tmp/adminer/plugins/ . \
